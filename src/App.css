@@ -1,7 +1,19 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+.main-container {
+    width: 100vw;
+    background-color: #c4c4c4;
+    height: 100vh;
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column nowrap;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
+.navigation-bar {
+    border-bottom: 2px solid #E3DFDF;
+    width: 100%;
+    height: 42px;
+    background-color: #a6a6a6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
