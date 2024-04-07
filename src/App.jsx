@@ -1,7 +1,9 @@
 import "./App.css";
-import ButtonIcon from "../components/ButtonIcon/index.jsx";
-import {CloseOutlined, MinusOutlined, UserOutlined} from "@ant-design/icons";
+import ButtonIcon from "./components/ButtonIcon/index.jsx";
+import {CloseOutlined, MinusOutlined} from "@ant-design/icons";
 import {appWindow} from '@tauri-apps/api/window'
+import Home from "./pages/home/index.jsx";
+import {Redirect, Route, Switch} from "react-router-dom";
 
 function App() {
 
@@ -40,6 +42,12 @@ function App() {
     return (
         <div className="main-container">
             <NavigationBar/>
+            <div className="content-container">
+                <Switch>
+                    <Route exact path="/home" component={Home}></Route>
+                    <Redirect path="/" to="/home"/>
+                </Switch>
+            </div>
         </div>
     );
 }
