@@ -1,0 +1,10 @@
+.button-icon-container {
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.button-icon-container:hover {
+    background-color: #939393;
+}
