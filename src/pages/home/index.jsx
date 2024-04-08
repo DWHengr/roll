@@ -1,6 +1,9 @@
 import "./index.css"
-import {useEffect, useState} from "react";
-import {DoubleRightOutlined, DoubleLeftOutlined} from "@ant-design/icons";
+import {useEffect, useRef, useState} from "react";
+import {ClearOutlined, CloseOutlined, DoubleLeftOutlined, DoubleRightOutlined} from "@ant-design/icons";
+import FullButton from "../../components/FullButton/index.jsx";
+import ButtonIcon from "../../components/ButtonIcon/index.jsx";
+import {appWindow} from "@tauri-apps/api/window";
 
 export default function Home() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -8,14 +11,35 @@ export default function Home() {
     const [rollInterval, setRollInterval] = useState(null);
     const [rolling, setRolling] = useState(false);
     const [seconds, setSeconds] = useState(5);
+    const [rollRecord, setRollRecord] = useState([]);
+    const recordRef = useRef(null);
+    const [rollData, setRollData] = useState(["王小二", "二牛", "菲菲"])
+    const scrollToBottom = () => {
+        const container = recordRef.current;
+        container.scrollTop = container.scrollHeight;
+    };
 
-    let rollData = ["王小二", "二牛", "菲菲"]
+    const randomDraw = (num = 1) => {
+        let luckyDogs = []
+        for (let i = 0; i < num; i++) {
+            let randIndex = Math.floor(Math.random() * rollData.length)
+            let randContent = rollData[randIndex]
+            // rollData.splice(randIndex, 1)
+            luckyDogs.push(randContent)
+        }
+        if (luckyDogs.length > 0) {
+            rollRecord.push(luckyDogs)
+        }
+        setRollData(rollData)
+        return luckyDogs
+    }
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
     };
 
     useEffect(() => {
+        scrollToBottom();
         if (rollData?.length > 0) {
             setShowContent(rollData[0])
         }
@@ -23,14 +47,14 @@ export default function Home() {
     }, [])
 
     useEffect(() => {
+        scrollToBottom();
         let timer;
         if (rolling) {
             timer = setInterval(() => {
                 if (seconds > 0) {
                     setSeconds(prevSeconds => prevSeconds - 1);
                 } else {
-                    clearInterval(rollInterval);
-                    setRolling(false);
+                    stopRolling()
                 }
             }, 1000);
         }
@@ -41,8 +65,7 @@ export default function Home() {
         setSeconds(5)
         if (!rolling) {
             const interval = setInterval(() => {
-                const randomName = rollData[Math.floor(Math.random() * rollData.length)];
-                setShowContent(randomName);
+                setShowContent(rollData[Math.floor(Math.random() * rollData.length)]);
             }, 100); // 每隔100ms随机更新一次结果
             setRollInterval(interval);
             setRolling(true);
@@ -51,6 +74,7 @@ export default function Home() {
 
     const stopRolling = () => {
         if (rolling) {
+            randomDraw(2);
             clearInterval(rollInterval);
             setRolling(false);
         }
@@ -64,9 +88,40 @@ export default function Home() {
                 }
             </div>
             <div className={`home-drawer ${drawerOpen ? 'open' : ''}`}>
-                记录
+                <div style={{textAlign: "center"}}>
+                    <div style={{
+                        backgroundColor: "#8a8a8a",
+                        display: "flex",
+                        padding: 10,
+                        justifyContent: "center",
+                        position: "relative"
+                    }}>
+                        <div style={{fontWeight: 600}}>抽取记录</div>
+                        <div style={{position: "absolute", right: 10}}>
+                            <ButtonIcon
+                                icon={<ClearOutlined style={{fontSize: 18, color: "#060C21"}}/>}
+                                onClick={() => {
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div ref={recordRef} style={{overflowY: 'scroll', height: 520}}>
+                        {
+                            rollRecord?.map((round, index) => {
+                                return (
+                                    <div key={index} style={{margin: 10, backgroundColor: "#c7c7c7", borderRadius: 5}}>
+                                        <div style={{fontSize: 12, color: "#8a8a8a"}}>第{index + 1}轮</div>
+                                        {round.map((item, subIndex) => (
+                                            <div key={subIndex}>{item} </div>
+                                        ))}
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
             </div>
-            <div style={{textAlign: "center"}}>
+            <div style={{display: "flex", flexDirection: "column", textAlign: "center", alignItems: "center"}}>
                 {
                     rollData?.length <= 0 ?
                         <div>
@@ -79,12 +134,15 @@ export default function Home() {
                             </div>
                         </div>
                 }
-                <button onClick={startRolling} disabled={rolling}>
-                    开始 {seconds}
-                </button>
-                <button onClick={stopRolling} disabled={!rolling}>
-                    停止
-                </button>
+                {rollData?.length > 0 &&
+                    (rolling ?
+                        <FullButton danger onClick={stopRolling}>
+                            停 止 {seconds}
+                        </FullButton> :
+                        <FullButton onClick={startRolling}>
+                            开 始
+                        </FullButton>)
+                }
             </div>
 
         </div>)

@@ -1,12 +1,13 @@
 import "./App.css";
 import ButtonIcon from "./components/ButtonIcon/index.jsx";
-import {CloseOutlined, MinusOutlined} from "@ant-design/icons";
+import {CloseOutlined, FullscreenExitOutlined, FullscreenOutlined, MinusOutlined} from "@ant-design/icons";
 import {appWindow} from '@tauri-apps/api/window'
 import Home from "./pages/home/index.jsx";
 import {Redirect, Route, Switch} from "react-router-dom";
+import {useState} from "react";
 
 function App() {
-
+    const [isFull, setIsFull] = useState(false)
     const NavigationBar = () => {
         return (<div data-tauri-drag-region className="navigation-bar">
             <div style={{
@@ -29,6 +30,21 @@ function App() {
                         appWindow.minimize()
                     }}
                 />
+                {isFull ?
+                    <ButtonIcon
+                        icon={<FullscreenExitOutlined style={{fontSize: 25, color: "#060C21"}}/>}
+                        onClick={() => {
+                            appWindow.setFullscreen(false)
+                            setIsFull(false)
+                        }}
+                    /> :
+                    <ButtonIcon
+                        icon={<FullscreenOutlined style={{fontSize: 25, color: "#060C21"}}/>}
+                        onClick={() => {
+                            appWindow.setFullscreen(true)
+                            setIsFull(true)
+                        }}
+                    />}
                 <ButtonIcon
                     icon={<CloseOutlined style={{fontSize: 25, color: "#060C21"}}/>}
                     onClick={() => {

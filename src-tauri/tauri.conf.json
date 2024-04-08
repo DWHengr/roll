@@ -19,7 +19,6 @@
     },
     "windows": [
       {
-        "fullscreen": false,
         "resizable": false,
         "title": "roll",
         "width": 980,
