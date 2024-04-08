@@ -1,0 +1,28 @@
+.full-button-container {
+    width: 200px;
+    height: 40px;
+    background: #060C21;
+    margin: 10px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.full-button-container.danger {
+    background: #ff4d4f;
+}
+
+.full-button-container.danger:hover {
+    background: rgba(255, 77, 79, 0.9);
+}
+
+.full-button-container:hover {
+    padding: 5px;
+    box-sizing: border-box;
+    background: rgba(6, 12, 33, 0.9);
+    border: 1px #ffffff solid;
+}
