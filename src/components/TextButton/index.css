@@ -1,0 +1,12 @@
+.text-button-container {
+    display: flex;
+    margin-left: 15px;
+    user-select: none;
+    cursor: pointer;
+    color: #5d5f63;
+}
+
+.text-button-container:hover {
+    color: #060c21;
+    font-weight: 600;
+}
