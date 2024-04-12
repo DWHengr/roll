@@ -1,17 +1,24 @@
 import "./index.css"
 import {useEffect, useRef, useState} from "react";
-import {ClearOutlined, DoubleLeftOutlined, DoubleRightOutlined, PlusOutlined} from "@ant-design/icons";
+import {
+    ClearOutlined,
+    DoubleLeftOutlined,
+    DoubleRightOutlined,
+    PieChartOutlined,
+    PlusOutlined
+} from "@ant-design/icons";
 import FullButton from "../../components/FullButton/index.jsx";
 import ButtonIcon from "../../components/ButtonIcon/index.jsx";
 import {db} from "../../utils/db.js";
-import {Modal} from "antd";
+import {Drawer, Modal} from "antd";
 import CustomButton from "../../components/CustomButton/index.jsx";
 import CustomAceEditor from "../../components/CustomAceEditor/index.jsx";
 import TextButton from "../../components/TextButton/index.jsx";
 import {useLiveQuery} from "dexie-react-hooks";
 
 export default function Home() {
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [recordDrawerOpen, setRecordDrawerOpen] = useState(false);
+    const [residualDrawerOpen, setResidualDrawerOpen] = useState(false);
     const [showContent, setShowContent] = useState("")
     const [rollInterval, setRollInterval] = useState(null);
     const [rolling, setRolling] = useState(false);
@@ -20,6 +27,7 @@ export default function Home() {
     const recordRef = useRef([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [addContentValue, setAddContentValue] = useState("")
+
     let residual = useLiveQuery(() => db.residual.toArray())
 
     useEffect(() => {
@@ -69,7 +77,7 @@ export default function Home() {
     }
 
     const toggleDrawer = () => {
-        setDrawerOpen(!drawerOpen);
+        setRecordDrawerOpen(!recordDrawerOpen);
     };
 
     const startRolling = () => {
@@ -113,20 +121,49 @@ export default function Home() {
 
     return (
         <div className="home-container">
+            <Drawer
+                title={`剩余未抽取 (${residual?.length})`}
+                placement="right"
+                closable={true}
+                onClose={() => setResidualDrawerOpen(false)}
+                open={residualDrawerOpen}
+                key="right"
+                width={280}
+                bodyStyle={{padding: 5}}
+            >
+                <div style={{userSelect: "none", overflowY: 'scroll', height: 540, fontSize: 20}}>
+                    {residual?.map((item, index) => (
+                        <div style={{
+                            padding: 10,
+                            backgroundColor: index % 2 === 0 ? '#e7e7e7' : '#ffffff',
+                        }}
+                             key={item?.id + "-" + index}
+                        >
+                            {item?.content}
+                        </div>))
+                    }
+                </div>
+            </Drawer>
             <div style={{position: "absolute", right: 10, top: 5}}>
                 <TextButton
-                    icon={<PlusOutlined style={{fontSize: 16}}/>}
+                    icon={<PlusOutlined style={{fontSize: 16, margin: 2}}/>}
                     onClick={() => setIsAddModalOpen(!isAddModalOpen)}
                 >
                     添加
                 </TextButton>
+                <TextButton
+                    icon={<PieChartOutlined style={{fontSize: 16, margin: 2}}/>}
+                    onClick={() => setResidualDrawerOpen(true)}
+                >
+                    剩余({residual?.length})
+                </TextButton>
             </div>
-            <div className={`home-drawer-toggle ${drawerOpen ? 'open' : ''}`} onClick={toggleDrawer}>
-                {drawerOpen ? <DoubleLeftOutlined style={{fontSize: 25, color: "#060C21"}}/> :
+            <div className={`home-drawer-toggle ${recordDrawerOpen ? 'open' : ''}`} onClick={toggleDrawer}>
+                {recordDrawerOpen ? <DoubleLeftOutlined style={{fontSize: 25, color: "#060C21"}}/> :
                     <DoubleRightOutlined style={{fontSize: 25, color: "#060C21"}}/>
                 }
             </div>
-            <div className={`home-drawer ${drawerOpen ? 'open' : ''}`}>
+            <div className={`home-drawer ${recordDrawerOpen ? 'open' : ''}`}>
                 <div style={{textAlign: "center"}}>
                     <div style={{
                         backgroundColor: "#8a8a8a",
@@ -177,9 +214,11 @@ export default function Home() {
                         <FullButton danger onClick={stopRolling}>
                             停 止 {seconds}
                         </FullButton> :
-                        <FullButton onClick={startRolling}>
-                            开 始
-                        </FullButton>)
+                        <>
+                            <FullButton onClick={startRolling}>
+                                开 始
+                            </FullButton>
+                        </>)
                 }
 
                 <Modal
