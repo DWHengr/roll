@@ -16,6 +16,7 @@ import CustomAceEditor from "../../components/CustomAceEditor/index.jsx";
 import TextButton from "../../components/TextButton/index.jsx";
 import {useLiveQuery} from "dexie-react-hooks";
 import OptionListPopover from "../../components/OptionListPopover/index.jsx";
+import Dialog from "../../components/Dialog/index.jsx";
 
 export default function Home() {
     const [recordDrawerOpen, setRecordDrawerOpen] = useState(false);
@@ -29,6 +30,8 @@ export default function Home() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [addContentValue, setAddContentValue] = useState("")
     const [delIconHoveredIndex, setDelIconHoveredIndex] = useState(null);
+    const [delAffirmVisible, setDelAffirmVisible] = useState(false)
+    const [delContent, setDelContent] = useState(false)
 
     let rollRecord = useLiveQuery(() => db.records.toArray())
     let residual = useLiveQuery(() => db.residual.toArray())
@@ -123,9 +126,15 @@ export default function Home() {
         db.contents.where({type: "default"}).toArray().then(v => db.residual.bulkPut(v))
     }
 
-    const onDelContent = (id) => {
-        db.contents.where({id: id}).delete()
-        db.residual.where({id: id}).delete()
+    const onVisibleDelAffirm = (content) => {
+        setDelContent(content)
+        setAllContentDrawerOpen(false)
+        setDelAffirmVisible(true)
+    }
+
+    const onDelContent = () => {
+        db.contents.where({id: delContent.id}).delete()
+        db.residual.where({id: delContent.id}).delete()
     }
 
     return (
@@ -178,7 +187,7 @@ export default function Home() {
                             </div>
                             <div
                                 style={{cursor: "pointer"}}
-                                onClick={() => onDelContent(item.id)}
+                                onClick={() => onVisibleDelAffirm(item)}
                             >
                                 {delIconHoveredIndex === index && <DeleteFilled style={{color: "#ff696b"}}/>}
                             </div>
@@ -186,6 +195,12 @@ export default function Home() {
                     }
                 </div>
             </Drawer>
+            <Dialog
+                tip={`确认删除? ${delContent?.content}`}
+                visible={delAffirmVisible}
+                onVisible={(visible) => setDelAffirmVisible(visible)}
+                onOk={onDelContent}
+            />
             <div style={{position: "absolute", right: 10, top: 5}}>
                 <TextButton
                     icon={<PlusOutlined style={{fontSize: 16, margin: 2}}/>}
