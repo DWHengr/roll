@@ -28,12 +28,23 @@
     left: 0;
     width: 25%;
     height: 100%;
-    background-color: #9f9f9f;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #d3d3d3;
     transition: transform 0.3s ease;
     transform: translateX(-100%);
 }
 
 .home-drawer.open {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     transform: translateX(0);
+}
+
+.home-drawer-content-item {
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+}
+
+.home-drawer-content-item:hover {
+    background-color: #e7e7e7;
+    transition: opacity 1.5s ease;
 }

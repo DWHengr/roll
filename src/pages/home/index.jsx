@@ -1,11 +1,11 @@
 import "./index.css"
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
-    ClearOutlined,
+    ClearOutlined, DeleteFilled,
     DoubleLeftOutlined,
     DoubleRightOutlined,
     PieChartOutlined,
-    PlusOutlined
+    PlusOutlined, UnorderedListOutlined
 } from "@ant-design/icons";
 import FullButton from "../../components/FullButton/index.jsx";
 import ButtonIcon from "../../components/ButtonIcon/index.jsx";
@@ -15,20 +15,24 @@ import CustomButton from "../../components/CustomButton/index.jsx";
 import CustomAceEditor from "../../components/CustomAceEditor/index.jsx";
 import TextButton from "../../components/TextButton/index.jsx";
 import {useLiveQuery} from "dexie-react-hooks";
+import OptionListPopover from "../../components/OptionListPopover/index.jsx";
 
 export default function Home() {
     const [recordDrawerOpen, setRecordDrawerOpen] = useState(false);
     const [residualDrawerOpen, setResidualDrawerOpen] = useState(false);
+    const [allContentDrawerOpen, setAllContentDrawerOpen] = useState(false);
     const [showContent, setShowContent] = useState("")
     const [rollInterval, setRollInterval] = useState(null);
     const [rolling, setRolling] = useState(false);
     const [seconds, setSeconds] = useState(5);
-    let rollRecord = useLiveQuery(() => db.records.toArray())
     const recordRef = useRef([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [addContentValue, setAddContentValue] = useState("")
+    const [delIconHoveredIndex, setDelIconHoveredIndex] = useState(null);
 
+    let rollRecord = useLiveQuery(() => db.records.toArray())
     let residual = useLiveQuery(() => db.residual.toArray())
+    let allContent = useLiveQuery(() => db.contents.toArray())
 
     useEffect(() => {
         return () => clearInterval(rollInterval);
@@ -119,8 +123,14 @@ export default function Home() {
         db.contents.where({type: "default"}).toArray().then(v => db.residual.bulkPut(v))
     }
 
+    const onDelContent = (id) => {
+        db.contents.where({id: id}).delete()
+        db.residual.where({id: id}).delete()
+    }
+
     return (
         <div className="home-container">
+            {/*剩余未抽取内容*/}
             <Drawer
                 title={`剩余未抽取 (${residual?.length})`}
                 placement="right"
@@ -144,6 +154,38 @@ export default function Home() {
                     }
                 </div>
             </Drawer>
+            {/*全部内容*/}
+            <Drawer
+                title={`全部内容`}
+                placement="right"
+                closable={true}
+                onClose={() => setAllContentDrawerOpen(false)}
+                open={allContentDrawerOpen}
+                key="right"
+                width={280}
+                bodyStyle={{padding: 5}}
+            >
+                <div style={{userSelect: "none", overflowY: 'scroll', height: 540, fontSize: 20}}>
+                    {allContent?.map((item, index) => (
+                        <div
+                            key={item?.id + "-" + index}
+                            onMouseEnter={() => setDelIconHoveredIndex(index)}
+                            onMouseLeave={() => setDelIconHoveredIndex(null)}
+                            className="home-drawer-content-item"
+                        >
+                            <div>
+                                {item?.content}
+                            </div>
+                            <div
+                                style={{cursor: "pointer"}}
+                                onClick={() => onDelContent(item.id)}
+                            >
+                                {delIconHoveredIndex === index && <DeleteFilled style={{color: "#ff696b"}}/>}
+                            </div>
+                        </div>))
+                    }
+                </div>
+            </Drawer>
             <div style={{position: "absolute", right: 10, top: 5}}>
                 <TextButton
                     icon={<PlusOutlined style={{fontSize: 16, margin: 2}}/>}
@@ -151,12 +193,21 @@ export default function Home() {
                 >
                     添加
                 </TextButton>
-                <TextButton
-                    icon={<PieChartOutlined style={{fontSize: 16, margin: 2}}/>}
-                    onClick={() => setResidualDrawerOpen(true)}
+                <OptionListPopover
+                    options={[{
+                        label: '全部内容', onClick: () => setAllContentDrawerOpen(true)
+                    }, {
+                        label: '高级设置', onClick: () => {
+                        }
+                    }]}
                 >
-                    剩余({residual?.length})
-                </TextButton>
+                    <div
+                        className="text-button-container"
+                    >
+                        <UnorderedListOutlined style={{fontSize: 16, margin: 2}}/>
+                        <div style={{marginLeft: 1}}>更多</div>
+                    </div>
+                </OptionListPopover>
             </div>
             <div className={`home-drawer-toggle ${recordDrawerOpen ? 'open' : ''}`} onClick={toggleDrawer}>
                 {recordDrawerOpen ? <DoubleLeftOutlined style={{fontSize: 25, color: "#060C21"}}/> :
@@ -166,7 +217,7 @@ export default function Home() {
             <div className={`home-drawer ${recordDrawerOpen ? 'open' : ''}`}>
                 <div style={{textAlign: "center"}}>
                     <div style={{
-                        backgroundColor: "#8a8a8a",
+                        backgroundColor: "#c0c0c0",
                         display: "flex",
                         padding: 10,
                         justifyContent: "center",
@@ -184,7 +235,7 @@ export default function Home() {
                         {
                             rollRecord?.map((round, index) => {
                                 return (
-                                    <div key={index} style={{margin: 10, backgroundColor: "#c7c7c7", borderRadius: 5}}>
+                                    <div key={index} style={{margin: 10, backgroundColor: "#c0c0c0", borderRadius: 5}}>
                                         <div style={{fontSize: 12, color: "#8a8a8a"}}>第{index + 1}轮</div>
                                         {round?.record?.map((item, subIndex) => (
                                             <div key={index + "-" + item?.id + "-" + subIndex}>{item?.content} </div>
@@ -200,7 +251,7 @@ export default function Home() {
                 {
                     residual?.length <= 0 ?
                         <div>
-                            <img src="/empty.svg"/>
+                            <img src="/empty.svg" alt=""/>
                             <div>空空如也</div>
                         </div> :
                         <div>
@@ -210,15 +261,28 @@ export default function Home() {
                         </div>
                 }
                 {residual?.length > 0 &&
-                    (rolling ?
-                        <FullButton danger onClick={stopRolling}>
-                            停 止 {seconds}
-                        </FullButton> :
-                        <>
-                            <FullButton onClick={startRolling}>
-                                开 始
-                            </FullButton>
-                        </>)
+                    <>
+                        {
+                            rolling ?
+                                <FullButton danger onClick={stopRolling}>
+                                    停 止 {seconds}
+                                </FullButton> :
+                                <>
+                                    <FullButton onClick={startRolling}>
+                                        开 始
+                                    </FullButton>
+                                </>
+                        }
+                        <div style={{width: 200, display: "flex", justifyContent: "end"}}>
+                            <TextButton
+                                icon={<PieChartOutlined
+                                    style={{fontSize: 16, margin: 2}}/>}
+                                onClick={() => setResidualDrawerOpen(true)}
+                            >
+                                剩余({residual?.length})
+                            </TextButton>
+                        </div>
+                    </>
                 }
 
                 <Modal
