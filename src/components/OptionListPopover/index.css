@@ -1,0 +1,20 @@
+.option-list-container {
+    text-align: center;
+    user-select: none;
+}
+
+.option-list-item {
+    padding: 5px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.option-list-item:hover {
+    background-color: #a9a9a9;
+}
+
+.option-list-name {
+    font-size: 12px;
+    border-bottom: 2px #8f8f8f solid;
+}
