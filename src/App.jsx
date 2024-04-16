@@ -5,6 +5,8 @@ import {appWindow} from '@tauri-apps/api/window'
 import Home from "./pages/home/index.jsx";
 import {Redirect, Route, Switch} from "react-router-dom";
 import {useState} from "react";
+import Msg from "./components/Msg/index.jsx";
+import {App as AppAntd} from 'antd';
 
 function App() {
     const [isFull, setIsFull] = useState(false)
@@ -56,15 +58,19 @@ function App() {
     }
 
     return (
-        <div className="main-container">
-            <NavigationBar/>
-            <div className="content-container">
-                <Switch>
-                    <Route exact path="/home" component={Home}></Route>
-                    <Redirect path="/" to="/home"/>
-                </Switch>
-            </div>
-        </div>
+        <AppAntd>
+            <Msg>
+                <div className="main-container">
+                    <NavigationBar/>
+                    <div className="content-container">
+                        <Switch>
+                            <Route exact path="/home" component={Home}></Route>
+                            <Redirect path="/" to="/home"/>
+                        </Switch>
+                    </div>
+                </div>
+            </Msg>
+        </AppAntd>
     );
 }
 
