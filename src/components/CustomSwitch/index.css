@@ -1,0 +1,11 @@
+.custom-switch {
+
+    .ant-switch-checked:nth-child(1) {
+        background-color: #060C21;
+    }
+
+    .ant-switch-checked:hover:nth-child(1) {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+}
