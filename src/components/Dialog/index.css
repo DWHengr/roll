@@ -6,7 +6,7 @@
     padding: 20px;
     border-radius: 10px;
     width: 260px;
-    background-color: #9a9a9a;
+    background-color: #c7c7c7;
     z-index: 999;
 }
 
@@ -18,5 +18,5 @@
     height: 100%;
     z-index: 888;
     border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.45);
 }

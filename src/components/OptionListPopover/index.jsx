@@ -23,8 +23,8 @@ export default function OptionListPopover({children, options, titleContent}) {
                             {titleContent}
                         </div> : <></>
                 }
-                {options?.map(option => (
-                    <div className="option-list-item">
+                {options?.map((option, index) => (
+                    <div className="option-list-item" key={index}>
                         <div
                             onClick={() => {
                                 if (option.onClick)
