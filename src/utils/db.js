@@ -12,22 +12,26 @@ db.version(1).stores({
     sets: 'name, content',
 });
 
-const amount = await db.sets.where('name').equals('amount').toArray();
-if (amount.length === 0) {
-    await db.sets.add({name: 'amount', content: 1});
-}
+db.sets.where('name').equals('amount').toArray().then((amount) => {
+    if (amount.length === 0) {
+        db.sets.add({name: 'amount', content: 1});
+    }
 
-const interval = await db.sets.where('name').equals('interval').toArray();
-if (interval.length === 0) {
-    await db.sets.add({name: 'interval', content: 5});
-}
+});
+db.sets.where('name').equals('interval').toArray().then((interval) => {
+    if (interval.length === 0) {
+        db.sets.add({name: 'interval', content: 5});
+    }
+});
 
-const fontSize = await db.sets.where('name').equals('fontSize').toArray();
-if (fontSize.length === 0) {
-    await db.sets.add({name: 'fontSize', content: 80});
-}
+db.sets.where('name').equals('fontSize').toArray().then((fontSize) => {
+    if (fontSize.length === 0) {
+        db.sets.add({name: 'fontSize', content: 80});
+    }
+});
 
-const isRepeat = await db.sets.where('name').equals('isRepeat').toArray();
-if (isRepeat.length === 0) {
-    await db.sets.add({name: 'isRepeat', content: true});
-}
+db.sets.where('name').equals('isRepeat').toArray().then((isRepeat) => {
+    if (isRepeat.length === 0) {
+        db.sets.add({name: 'isRepeat', content: true});
+    }
+});
