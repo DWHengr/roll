@@ -12,7 +12,7 @@ import {
 import FullButton from "../../components/FullButton/index.jsx";
 import ButtonIcon from "../../components/ButtonIcon/index.jsx";
 import {db} from "../../utils/db.js";
-import {Drawer, Form, InputNumber, Modal, Switch} from "antd";
+import {Drawer, Form, InputNumber, Modal} from "antd";
 import CustomButton from "../../components/CustomButton/index.jsx";
 import CustomAceEditor from "../../components/CustomAceEditor/index.jsx";
 import TextButton from "../../components/TextButton/index.jsx";
@@ -154,6 +154,7 @@ export default function Home() {
     const stopRolling = () => {
         if (rolling) {
             randomDraw(sysSetFormContent.amount ? sysSetFormContent.amount : 1)
+            Msg.onSucceedMsg("抽取成功,请查看抽取记录")
             clearInterval(rollInterval)
             setRolling(false)
         }
